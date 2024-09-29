@@ -1,5 +1,5 @@
-use anchor_lang::prelude::*;
 use crate::state::ContractState;
+use anchor_lang::prelude::*;
 
 pub fn intialize_contract(ctx: Context<InitializeContract>, bump: u8) -> Result<()> {
     let contract_state = &mut ctx.accounts.contract_state;
@@ -13,8 +13,8 @@ pub fn intialize_contract(ctx: Context<InitializeContract>, bump: u8) -> Result<
 pub struct InitializeContract<'info> {
     #[account(init_if_needed,
     payer = payer,
- space = 8 + 8 + 1,
-    seeds = [b"deauthe"],
+    space = 8 + ContractState::INIT_SPACE,
+    seeds = [ContractState::SEED_PREFIX.as_ref()],
     bump,
     )]
     pub contract_state: Account<'info, ContractState>,

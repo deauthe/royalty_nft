@@ -1,12 +1,11 @@
-use anchor_lang::prelude::*;
+use crate::errors;
 use crate::state::UserRoyaltyInfo;
-
-pub fn distribute_royalties(
-    ctx: Context<DistributeRoyalties>,
-    total_royalties: u64,
-) -> Result<()> {
+use anchor_lang::prelude::*;
+pub fn distribute_royalties(ctx: Context<DistributeRoyalties>, total_royalties: u64) -> Result<()> {
     // Proportional royalty distribution logic
-    Ok(())
+    ctx.accounts
+        .user_royalty_info
+        .distribute_royalties(total_royalties)
 }
 
 #[derive(Accounts)]

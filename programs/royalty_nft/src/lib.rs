@@ -1,5 +1,6 @@
 use anchor_lang::prelude::*;
 use instructions::*;
+pub mod errors;
 pub mod instructions;
 pub mod state;
 declare_id!("GaMVToeXNUeCjzduQegv8tURziz9mCrbgtzUF6LFEx29");
@@ -18,8 +19,7 @@ mod royalty_nft {
         name: String,
         nft_uri: String,
     ) -> Result<()> {
-
-      instructions::mint_nft(ctx, symbol, name, nft_uri)
+        instructions::mint_nft(ctx, symbol, name, nft_uri)
     }
 
     // 2. Buy shares of the NFT
@@ -37,16 +37,6 @@ mod royalty_nft {
 
     // 4. Claim royalties
     pub fn claim_royalties(ctx: Context<ClaimRoyalties>) -> Result<()> {
-       instructions::claim_royalties(ctx)
+        instructions::claim_royalties(ctx)
     }
 }
-
-
-
-
-
-
-
-
-
-

@@ -1,5 +1,5 @@
-use anchor_lang::prelude::*;
 use crate::state::UserRoyaltyInfo;
+use anchor_lang::prelude::*;
 
 pub fn claim_royalties(ctx: Context<ClaimRoyalties>) -> Result<()> {
     let pda = &mut ctx.accounts.user_royalty_info;
