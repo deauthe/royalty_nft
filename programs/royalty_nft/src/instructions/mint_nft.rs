@@ -30,7 +30,7 @@ pub fn mint_nft(
     associated_token::create(CpiContext::new(
         ctx.accounts.associated_token_program.to_account_info(),
         associated_token::Create {
-            payer: ctx.accounts.mint_authority.to_account_info(),
+            payer: ctx.accounts.payer.to_account_info(),
             associated_token: ctx.accounts.token_account.to_account_info(),
             authority: ctx.accounts.mint_authority.to_account_info(),
             mint: ctx.accounts.mint.to_account_info(),
@@ -38,21 +38,6 @@ pub fn mint_nft(
             token_program: ctx.accounts.token_program.to_account_info(),
         },
     ))?;
-
-    msg!("Minting token to token account...");
-    msg!("Mint: {}", &ctx.accounts.mint.to_account_info().key());
-    msg!("Token Address: {}", &ctx.accounts.token_account.key());
-    token::mint_to(
-        CpiContext::new(
-            ctx.accounts.token_program.to_account_info(),
-            token::MintTo {
-                mint: ctx.accounts.mint.to_account_info(),
-                to: ctx.accounts.token_account.to_account_info(),
-                authority: ctx.accounts.mint_authority.to_account_info(),
-            },
-        ),
-        1,
-    )?;
 
     msg!("Creating metadata account...");
     msg!(
@@ -128,6 +113,22 @@ pub fn mint_nft(
     .invoke();
 
     msg!("master edition created");
+
+    msg!("Minting token to token account...");
+    msg!("Mint: {}", &ctx.accounts.mint.to_account_info().key());
+    msg!("Token Address: {}", &ctx.accounts.token_account.key());
+    token::mint_to(
+        CpiContext::new(
+            ctx.accounts.token_program.to_account_info(),
+            token::MintTo {
+                mint: ctx.accounts.mint.to_account_info(),
+                to: ctx.accounts.token_account.to_account_info(),
+                authority: ctx.accounts.mint_authority.to_account_info(),
+            },
+        ),
+        1,
+    )?;
+
     msg!("Freezing mint Authority");
     let freeze_result = token::set_authority(
         CpiContext::new(
@@ -145,8 +146,10 @@ pub fn mint_nft(
         Ok(_) => msg!("Mint authority has been frozen"),
         Err(e) => msg!("Error freezing mint authority: {:?}", e),
     }
+
     Ok(())
 }
+
 
 #[derive(Accounts)]
 pub struct MintNft<'info> {
