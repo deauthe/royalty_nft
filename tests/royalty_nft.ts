@@ -67,7 +67,7 @@ describe("royalty_nft", () => {
 
 		const [mintAuthorityPda, _bump] =
 			await anchor.web3.PublicKey.findProgramAddress(
-				[Buffer.from("mint_authority")], // You can customize the seed
+				[Buffer.from("mint_authority_seed")], // You can customize the seed
 				program.programId
 			);
 		// Derive the metadata and master edition addresses

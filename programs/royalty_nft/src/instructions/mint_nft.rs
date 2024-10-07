@@ -1,5 +1,4 @@
 use anchor_lang::prelude::*;
-use anchor_lang::system_program;
 use anchor_spl::associated_token;
 use anchor_spl::token::{self, Mint};
 use anchor_spl::{associated_token::AssociatedToken, token::Token};
@@ -8,7 +7,7 @@ use mpl_token_metadata::instructions::{
     self, CreateMasterEditionV3Cpi, CreateMasterEditionV3CpiAccounts,
     CreateMasterEditionV3InstructionArgs,
 };
-use mpl_token_metadata::instructions::{CreateMasterEditionV3, CreateMetadataAccountV3CpiAccounts};
+use mpl_token_metadata::instructions::CreateMetadataAccountV3CpiAccounts;
 use mpl_token_metadata::programs::MPL_TOKEN_METADATA_ID;
 use mpl_token_metadata::types::Creator;
 use mpl_token_metadata::types::DataV2;
@@ -160,7 +159,7 @@ pub struct MintNft<'info> {
     #[account(mut)]
     pub master_edition: UncheckedAccount<'info>,
 
-    ///CHECK : this is safe because we dont read or write from this account
+    ///CHECK : this is safe because we dont read or write from this account]
     pub metadata: AccountInfo<'info>,
 
     ///CHECK : this is safe because we dont read or write from this account

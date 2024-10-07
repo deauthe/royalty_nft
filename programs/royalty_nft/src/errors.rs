@@ -6,4 +6,6 @@ pub enum CustomErrors {
     DataTooLarge,
     #[msg("MyAccount may only hold data below 100")]
     RoyaltyDistributeFailed,
+    #[msg("Could not add shares into user's account")]
+    AddShares,
 }

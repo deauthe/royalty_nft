@@ -1,6 +1,17 @@
-use crate::state::UserRoyaltyInfo;
+use crate::state::{royalty, UserRoyaltyInfo};
+use crate::errors::CustomErrors::AddShares;
 use anchor_lang::prelude::*;
+
 pub fn buy_shares(ctx: Context<BuyShares>, share_amount: u64) -> Result<()> {
+
+    let user_royalty_info = &mut ctx.accounts.user_royalty_info;
+
+
+
+    let res  = user_royalty_info.add_shares(share_amount);
+    if res.is_err() {
+        return Err(AddShares.into());
+    }
     Ok(())
 }
 

@@ -35,8 +35,7 @@ mod royalty_nft {
         instructions::distribute_royalties(ctx, total_royalties)
     }
 
-    // 4. Claim royalties
-    pub fn claim_royalties(ctx: Context<ClaimRoyalties>) -> Result<()> {
-        instructions::claim_royalties(ctx)
+    pub fn add_royalties_to_pool(ctx:Context<AddRoyaltiesToPool>, amount: u64)-> Result<()>{
+        instructions::add_royalties_to_pool(ctx, amount)
     }
 }
