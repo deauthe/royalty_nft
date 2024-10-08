@@ -2,27 +2,26 @@ use anchor_lang::prelude::*;
 
 pub const MAX_EPOCHS: u64 = 50; //TODO: change this to something smaller after figuring out a way to delete data
 
-
 #[account]
 #[derive(InitSpace)]
 pub struct UserRoyaltyInfo {
-    pub bump: u8, //to push off curve and retrieve
-    pub shares: u64,                        // User's NFT share balance
-    pub pending_royalties: u64,             // Pending royalties to be claimed
+    pub bump: u8,               //to push off curve and retrieve
+    pub shares: u64,            // User's NFT share balance
+    pub pending_royalties: u64, // Pending royalties to be claimed
     #[max_len(MAX_EPOCHS)]
-    pub claimed_royalties: Vec<u64>,        // Royalties claimed for each epoch, index is the epoch number, value is the amount 
-   
+    pub claimed_royalties: Vec<u64>, // Royalties claimed for each epoch, index is the epoch number, value is the amount
 }
 
 #[account]
 #[derive(InitSpace)]
-pub struct RoyaltyPool { //unique to each mint and user combination
-    pub last_sale_id : u64,                // Last sale id
-    pub total_royalties: u64,              // Total royalties ever added to the pool
-    pub current_epoch: u64,                // The current royalty distribution epoch
+pub struct RoyaltyPool {
+    //unique to each mint and user combination
+    pub last_sale_id: u64,    // Last sale id
+    pub total_royalties: u64, // Total royalties ever added to the pool
+    pub current_epoch: u64,   // The current royalty distribution epoch
     #[max_len(MAX_EPOCHS)]
-    pub royalties_per_epoch: Vec<u64>,     // List of royalties distributed per epoch, index is epoch
-    pub sol_balance: u64,  
+    pub royalties_per_epoch: Vec<u64>, // List of royalties distributed per epoch, index is epoch
+    pub sol_balance: u64,
 }
 
 impl UserRoyaltyInfo {
@@ -36,12 +35,7 @@ impl UserRoyaltyInfo {
         self.shares += share_amount;
         Ok(())
     }
-
-    
-
 }
-
-
 
 impl RoyaltyPool {
     pub const SEED_PREFIX: &'static [u8] = b"royalty_pool";
@@ -63,5 +57,4 @@ impl RoyaltyPool {
     fn get_total_royalties(&self) -> u64 {
         self.total_royalties
     }
-
 }

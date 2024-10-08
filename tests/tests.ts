@@ -1,8 +1,14 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { RoyaltyNft } from "../target/types/royalty_nft";
-import { PublicKey, sendAndConfirmTransaction } from "@solana/web3.js";
+import { Keypair, PublicKey, sendAndConfirmTransaction } from "@solana/web3.js";
+import {
+	createMint,
+	getAccount,
+	getOrCreateAssociatedTokenAccount,
+} from "@solana/spl-token";
 import {} from "@solana/spl-token";
+import { assert } from "chai";
 
 const program = anchor.workspace.RoyaltyNft as Program<RoyaltyNft>;
 
@@ -10,6 +16,15 @@ const TOKEN_METADATA_PROGRAM_ID = new anchor.web3.PublicKey(
 	"metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
 );
 const TOKEN_PROGRAM_ID = anchor.utils.token.TOKEN_PROGRAM_ID;
+const payer = Keypair.generate();
+
+before(async () => {
+	// Airdrop SOL to the payer
+	await anchor.AnchorProvider.env().connection.requestAirdrop(
+		payer.publicKey,
+		2 * anchor.web3.LAMPORTS_PER_SOL
+	);
+});
 
 describe("royalty_nft", () => {
 	// Configure the client to use the local cluster.
@@ -24,6 +39,70 @@ describe("royalty_nft", () => {
 			})
 			.rpc();
 		console.log("Your transaction signature", tx);
+	});
+
+	it("create nft", async () => {
+		const connection = anchor.AnchorProvider.env().connection;
+		const mint = await createMint(
+			connection,
+			payer,
+			payer.publicKey,
+			payer.publicKey,
+			0
+		);
+
+		const usertokenAccount = await getOrCreateAssociatedTokenAccount(
+			connection,
+			payer,
+			mint,
+			payer.publicKey
+		);
+
+		const tx = program.methods
+			.createNft("Who", "how", "https://idk.com/image1.jpg")
+			.accounts({
+				mint: "",
+				payer: payer.publicKey,
+				tokenAccount: usertokenAccount.address,
+			})
+			.signers([payer])
+			.rpc();
+
+		//check if metadata account got created
+		const [metadataAccount] = PublicKey.findProgramAddressSync(
+			[
+				Buffer.from("metadata"),
+				TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+				mint.toBuffer(),
+			],
+			TOKEN_METADATA_PROGRAM_ID
+		);
+
+		const [masterEditionAccount] = PublicKey.findProgramAddressSync(
+			[
+				Buffer.from("metadata"),
+				TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+				mint.toBuffer(),
+				Buffer.from("edition"),
+			],
+			TOKEN_METADATA_PROGRAM_ID
+		);
+
+		const metadataAccountInfo = await connection.getAccountInfo(
+			metadataAccount
+		);
+		assert.ok(metadataAccountInfo !== null);
+
+		const editionAccountInfo = await connection.getAccountInfo(
+			masterEditionAccount
+		);
+		assert.ok(editionAccountInfo !== null);
+
+		const tokenAccountInfo = await getAccount(
+			connection,
+			usertokenAccount.address
+		);
+		assert.ok(tokenAccountInfo.amount === BigInt(1));
 	});
 
 	it("mint nft!", async () => {

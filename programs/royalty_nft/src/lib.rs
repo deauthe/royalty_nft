@@ -1,5 +1,6 @@
 use anchor_lang::prelude::*;
 use instructions::*;
+use mpl_token_metadata::types::Creator;
 pub mod errors;
 pub mod instructions;
 pub mod state;
@@ -13,6 +14,16 @@ mod royalty_nft {
         initialize_contract::intialize_contract(ctx, bump)
     }
 
+    pub fn create_nft(
+        ctx:Context<CreateNft>,
+        symbol: String,
+        name:String,
+        uri:String,
+
+    ) -> Result<()>{
+        instructions::create_nft(ctx, name, symbol, uri)
+    }
+    
     pub fn mint_nft(
         ctx: Context<MintNft>,
         symbol: String,
@@ -35,7 +46,7 @@ mod royalty_nft {
         instructions::distribute_royalties(ctx, total_royalties)
     }
 
-    pub fn add_royalties_to_pool(ctx:Context<AddRoyaltiesToPool>, amount: u64)-> Result<()>{
+    pub fn add_royalties_to_pool(ctx: Context<AddRoyaltiesToPool>, amount: u64) -> Result<()> {
         instructions::add_royalties_to_pool(ctx, amount)
     }
 }

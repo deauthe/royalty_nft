@@ -8,26 +8,34 @@ pub fn distribute_royalties(ctx: Context<DistributeRoyalties>, total_royalties: 
 
     let current_epoch = royalty_pool.current_epoch;
 
-    for epoch in 0..current_epoch{
-
-        if user_royalty_info.claimed_royalties.get(epoch as usize).unwrap_or(&0) > &0 {
+    for epoch in 0..current_epoch {
+        if user_royalty_info
+            .claimed_royalties
+            .get(epoch as usize)
+            .unwrap_or(&0)
+            > &0
+        {
             continue; //user already claimed royalties for this epoch
         }
 
-        let epoch_royalties = royalty_pool.royalties_per_epoch.get(epoch as usize).unwrap();
-        let user_share = (user_royalty_info.shares * epoch_royalties) / royalty_pool.total_royalties;
+        let epoch_royalties = royalty_pool
+            .royalties_per_epoch
+            .get(epoch as usize)
+            .unwrap();
+        let user_share =
+            (user_royalty_info.shares * epoch_royalties) / royalty_pool.total_royalties;
 
         user_royalty_info.add_royalty(user_share); //increases the pending royalties for the user
 
-        if epoch as usize >= user_royalty_info.claimed_royalties.len(){
+        if epoch as usize >= user_royalty_info.claimed_royalties.len() {
             user_royalty_info.claimed_royalties.push(user_share); //store claimed royalties for this epoch
-        }else{
-            user_royalty_info.claimed_royalties[epoch as usize] = user_share; //mark the current epoch as claimed 
+        } else {
+            user_royalty_info.claimed_royalties[epoch as usize] = user_share; //mark the current epoch as claimed
         }
     }
 
-     // Transfer SOL to the user's account
-     let cpi_ctx = CpiContext::new(
+    // Transfer SOL to the user's account
+    let cpi_ctx = CpiContext::new(
         ctx.accounts.system_program.to_account_info(),
         anchor_lang::system_program::Transfer {
             from: royalty_pool.to_account_info(),
@@ -42,7 +50,6 @@ pub fn distribute_royalties(ctx: Context<DistributeRoyalties>, total_royalties: 
     Ok(())
 }
 
-
 #[derive(Accounts)]
 pub struct DistributeRoyalties<'info> {
     #[account(
@@ -56,7 +63,9 @@ pub struct DistributeRoyalties<'info> {
           bump)]
     pub user_royalty_info: Account<'info, UserRoyaltyInfo>,
     #[account(mut, signer)]
-    pub user: Signer<'info>,  // User initiating the claim
+    pub user: Signer<'info>, // User initiating the claim
+    
+    ///CHECK : this is safe because we dont read or write from this account
     pub mint: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
 }

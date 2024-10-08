@@ -3,11 +3,11 @@ use anchor_spl::associated_token;
 use anchor_spl::token::{self, Mint};
 use anchor_spl::{associated_token::AssociatedToken, token::Token};
 use instructions::{CreateMetadataAccountV3Cpi, CreateMetadataAccountV3InstructionArgs};
+use mpl_token_metadata::instructions::CreateMetadataAccountV3CpiAccounts;
 use mpl_token_metadata::instructions::{
     self, CreateMasterEditionV3Cpi, CreateMasterEditionV3CpiAccounts,
     CreateMasterEditionV3InstructionArgs,
 };
-use mpl_token_metadata::instructions::CreateMetadataAccountV3CpiAccounts;
 use mpl_token_metadata::programs::MPL_TOKEN_METADATA_ID;
 use mpl_token_metadata::types::Creator;
 use mpl_token_metadata::types::DataV2;
@@ -148,7 +148,6 @@ pub fn mint_nft(
 
     Ok(())
 }
-
 
 #[derive(Accounts)]
 pub struct MintNft<'info> {

@@ -36,6 +36,7 @@ pub struct AddRoyaltiesToPool<'info> {
         bump,
     )]
     pub royalty_pool_account: Account<'info, RoyaltyPool>,
+    ///CHECK : this is safe because we dont read or write from this account
     pub mint: AccountInfo<'info>,
     pub admin: Signer<'info>,
     pub system_program: Program<'info, System>,
