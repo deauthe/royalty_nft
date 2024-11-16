@@ -8,6 +8,11 @@ anchor deploy
 anchor test
 ```
 
+### if you run into some problems here are some links I visited while going through the code
+[anchor-test-cant-start-validator-but-solana-test-validator-works-fine](https://solana.stackexchange.com/questions/5596/anchor-test-cant-start-validator-but-solana-test-validator-works-fine)
+[anchor-test-error-your-configured-rpc-port-8899-is-already-in-use](https://solana.stackexchange.com/questions/3117/anchor-test-error-your-configured-rpc-port-8899-is-already-in-use)
+
+
 # contract docs
 ### Difference between minting and creating
 
