@@ -5,16 +5,26 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-royalty_nft = "GaMVToeXNUeCjzduQegv8tURziz9mCrbgtzUF6LFEx29"
+royalty_nft = "BQ7VPNzn8Ha9EH1u2tPrJ6TN9VawRacUFiUFoQrzi2oJ"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "localnet"
+cluster = "Localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
+jest_test = "yarn test"
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
 
+[test]
+startup_wait = 5000
+shutdown_wait = 2000
+upgradeable = false
+
 [test.validator]
+url = "https://api.mainnet-beta.solana.com" # This is the url of the cluster that accounts are cloned from (See `test.validator.clone`).
+bind_address = "0.0.0.0"
+ledger = ".anchor/test-ledger"
+rpc_port = 8899

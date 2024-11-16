@@ -1,9 +1,9 @@
 use crate::state::ContractState;
 use anchor_lang::prelude::*;
 
-pub fn intialize_contract(ctx: Context<InitializeContract>, bump: u8) -> Result<()> {
+pub fn intialize_contract(ctx: Context<InitializeContract>) -> Result<()> {
     let contract_state = &mut ctx.accounts.contract_state;
-    contract_state.bump = bump;
+    contract_state.bump = ctx.bumps.contract_state;
     contract_state.total_items = 0;
     msg!("intialized");
     Ok(())

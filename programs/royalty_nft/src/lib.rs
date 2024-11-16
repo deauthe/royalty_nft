@@ -4,26 +4,25 @@ use mpl_token_metadata::types::Creator;
 pub mod errors;
 pub mod instructions;
 pub mod state;
-declare_id!("GaMVToeXNUeCjzduQegv8tURziz9mCrbgtzUF6LFEx29");
+declare_id!("BQ7VPNzn8Ha9EH1u2tPrJ6TN9VawRacUFiUFoQrzi2oJ");
 
 #[program]
 mod royalty_nft {
     use super::*;
 
-    pub fn intialize_contract(ctx: Context<InitializeContract>, bump: u8) -> Result<()> {
-        initialize_contract::intialize_contract(ctx, bump)
+    pub fn intialize_contract(ctx: Context<InitializeContract>) -> Result<()> {
+        initialize_contract::intialize_contract(ctx)
     }
 
     pub fn create_nft(
-        ctx:Context<CreateNft>,
+        ctx: Context<CreateNft>,
         symbol: String,
-        name:String,
-        uri:String,
-
-    ) -> Result<()>{
+        name: String,
+        uri: String,
+    ) -> Result<()> {
         instructions::create_nft(ctx, name, symbol, uri)
     }
-    
+
     pub fn mint_nft(
         ctx: Context<MintNft>,
         symbol: String,
