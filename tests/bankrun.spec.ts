@@ -3,38 +3,41 @@ import { PublicKey } from "@solana/web3.js";
 import { BankrunProvider } from "anchor-bankrun";
 import { RoyaltyNft } from "../target/types/royalty_nft";
 import { Program } from "@coral-xyz/anchor";
-import { expect, describe, test, beforeEach } from "@jest/globals";
-
+import { expect, describe, test } from "@jest/globals";
 import * as anchor from "@coral-xyz/anchor";
-import { Console, log } from "console";
 
 const ROYALTY_PROGRAM_ID = new PublicKey(
   "BQ7VPNzn8Ha9EH1u2tPrJ6TN9VawRacUFiUFoQrzi2oJ"
 );
 describe("royalty_nft", () => {
-  let context;
-  let provider: BankrunProvider;
-  let program: Program<RoyaltyNft>;
-  let payer: anchor.Wallet;
-
   test("initiate contract", async () => {
     console.log("intializing contract");
-    context = await startAnchor("./", [], []);
-    provider = new BankrunProvider(context);
+    let context = await startAnchor("./", [], []);
+    let provider = new BankrunProvider(context);
 
-    program = anchor.workspace.RoyaltyNft as Program<RoyaltyNft>;
-    payer = provider.wallet;
+    let program = anchor.workspace.RoyaltyNft as Program<RoyaltyNft>;
+    let payer = provider.wallet;
+
+    try {
+      const tx = await program.methods
+        .intializeContract()
+        .accounts({
+          payer: payer.publicKey,
+        })
+        .rpc({ skipPreflight: true });
+      expect(tx).toBeDefined();
+    } catch (err) {
+      console.error("Transaction failed", err);
+      throw err;
+    }
   });
 
   test("create_nft", async () => {
-    console.log("payer is", payer.publicKey.toBase58());
-    console.log("program is", program.programId.toBase58());
+    let context = await startAnchor("./", [], []);
+    let provider = new BankrunProvider(context);
 
-    context = await startAnchor("./", [], []);
-    provider = new BankrunProvider(context);
-
-    program = anchor.workspace.RoyaltyNft as Program<RoyaltyNft>;
-    payer = provider.wallet;
+    let program = anchor.workspace.RoyaltyNft as Program<RoyaltyNft>;
+    let payer = provider.wallet;
 
     const [mintPda, mintPdaBump] = await PublicKey.findProgramAddress(
       [Buffer.from("mint")],
@@ -66,5 +69,5 @@ describe("royalty_nft", () => {
       console.error("Transaction failed", err);
       throw err;
     }
-  }, 100000);
+  });
 });
