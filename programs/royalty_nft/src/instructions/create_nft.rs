@@ -176,7 +176,10 @@ pub struct CreateNft<'info> {
 
 impl<'info> CreateNft<'info> {
     fn initialize_mint_ctx(&self) -> CpiContext<'_, '_, '_, 'info, InitializeMint<'info>> {
-        CpiContext::new(
+        //this account below might have to be changed later
+        let _signer : &[&[&[u8]]];
+
+        CpiContext::new( //should I use new_with_signer here?
             self.token_program.to_account_info(),
             InitializeMint {
                 mint: self.mint.to_account_info(),
