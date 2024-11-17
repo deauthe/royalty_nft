@@ -11,15 +11,15 @@ royalty_nft = "BQ7VPNzn8Ha9EH1u2tPrJ6TN9VawRacUFiUFoQrzi2oJ"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Localnet"
+cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
 jest_test = "yarn test"
-test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
+test = "yarn test"
 
 [test]
-startup_wait = 5000
+startup_wait = 20000
 shutdown_wait = 2000
 upgradeable = false
 
