@@ -48,6 +48,42 @@ describe("royalty_nft", () => {
 
 			throw err;
 		}
+
+		const [mintPda, mintPdaBump] = await PublicKey.findProgramAddress(
+			[Buffer.from("mint")],
+			program.programId
+		);
+
+		const [tokenAccountPda, tokenAccountBump] =
+			await PublicKey.findProgramAddress(
+				[
+					payer.publicKey.toBuffer(),
+					program.programId.toBuffer(),
+					mintPda.toBuffer(),
+				],
+				anchor.utils.token.TOKEN_PROGRAM_ID
+			);
+		console.log("mintPda", mintPda.toBase58());
+		console.log("tokenAccountPda", tokenAccountPda.toBase58());
+		try {
+			const tx = await program.methods
+				.createNft("SYM", "test-token", "test-uri")
+				.accountsPartial({
+					payer: payer.publicKey,
+					mint: mintPda,
+					tokenAccount: tokenAccountPda,
+					contractState: contractStatePda,
+					systemProgram: anchor.web3.SystemProgram.programId,
+					tokenProgram: anchor.utils.token.TOKEN_PROGRAM_ID,
+				})
+				.rpc({ skipPreflight: true });
+			console.log("create nft transaction", tx);
+
+			await anchor.getProvider().connection.confirmTransaction(tx, "processed");
+			expect(tx).toBeDefined();
+		} catch (err) {
+			throw err;
+		}
 	});
 
 	test("create_nft", async () => {
@@ -100,6 +136,12 @@ describe("royalty_nft", () => {
 			throw err;
 		}
 
+		const [royaltyPoolPda, royaltyPoolBump] =
+			await PublicKey.findProgramAddress(
+				[Buffer.from("royalty_pool")],
+				program.programId
+			);
+
 		const [mintPda, mintPdaBump] = await PublicKey.findProgramAddress(
 			[Buffer.from("mint")],
 			program.programId
@@ -126,6 +168,7 @@ describe("royalty_nft", () => {
 					contractState: contractStatePda,
 					systemProgram: anchor.web3.SystemProgram.programId,
 					tokenProgram: anchor.utils.token.TOKEN_PROGRAM_ID,
+					royaltyPoolAccount: royaltyPoolPda,
 				})
 				.signers([payer])
 				.rpc({ skipPreflight: true });

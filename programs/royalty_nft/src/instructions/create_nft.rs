@@ -149,7 +149,7 @@ pub struct CreateNft<'info> {
         init,
         payer = payer,
         token::mint = mint,
-        token::authority = payer
+        token::authority = payer,
     )]
     pub token_account: Account<'info, TokenAccount>,
 
