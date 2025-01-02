@@ -4,7 +4,7 @@ use mpl_token_metadata::types::Creator;
 pub mod errors;
 pub mod instructions;
 pub mod state;
-declare_id!("8mwjmtyM1WQuyhihb1YHV2GERAfTBHJJhTJdZzHMf1UP");
+declare_id!("9FyDLMcnijDNmKwSwhZZCF7Gdp7ibz7LBmpQy9fGZq92");
 
 #[program]
 mod royalty_nft {

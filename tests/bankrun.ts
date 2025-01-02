@@ -65,6 +65,8 @@ describe("royalty_nft", () => {
 			);
 		console.log("mintPda", mintPda.toBase58());
 		console.log("tokenAccountPda", tokenAccountPda.toBase58());
+
+		const blockhash = context.lastBlockhash;
 		try {
 			const tx = await program.methods
 				.createNft("SYM", "test-token", "test-uri")
@@ -76,10 +78,12 @@ describe("royalty_nft", () => {
 					systemProgram: anchor.web3.SystemProgram.programId,
 					tokenProgram: anchor.utils.token.TOKEN_PROGRAM_ID,
 				})
-				.rpc({ skipPreflight: true });
+				.transaction();
+			tx.recentBlockhash = blockhash;
+			payer.signTransaction(tx);
+			client.sendTransaction(tx);
 			console.log("create nft transaction", tx);
 
-			await anchor.getProvider().connection.confirmTransaction(tx, "processed");
 			expect(tx).toBeDefined();
 		} catch (err) {
 			throw err;
@@ -88,27 +92,12 @@ describe("royalty_nft", () => {
 
 	test("create_nft", async () => {
 		let payer = Keypair.generate();
-		let context = await startAnchor(
-			"./",
-			[],
-			[
-				{
-					address: payer.publicKey,
-					info: {
-						lamports: 1000000000,
-						owner: payer.publicKey,
-						data: Buffer.alloc(0),
-						executable: false,
-					},
-				},
-			]
-		);
+		let context = await startAnchor("./", [], []);
 		const client = context.banksClient;
 
 		let provider = new BankrunProvider(context);
 		anchor.setProvider(provider);
 		let program = anchor.workspace.RoyaltyNft as Program<RoyaltyNft>;
-		let wallet = provider.wallet as anchor.Wallet;
 
 		const [contractStatePda, contractStateBump] =
 			await PublicKey.findProgramAddress(
@@ -124,14 +113,15 @@ describe("royalty_nft", () => {
 					systemProgram: anchor.web3.SystemProgram.programId,
 					payer: payer.publicKey,
 				})
-				.rpc();
+				.signers([payer])
+				.simulate();
 			console.log("tx", tx);
 			console.log("payer account :", payer.publicKey.toBase58());
 
 			expect(tx).toBeDefined();
 		} catch (err) {
 			console.log("Transaction failed");
-			console.log("payer account :", payer.publicKey.toBase58());
+			console.log("payer account 2 :", payer.publicKey.toBase58());
 
 			throw err;
 		}

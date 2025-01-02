@@ -1,7 +1,7 @@
 use crate::state::{ContractState, RoyaltyPool};
 use anchor_lang::prelude::*;
 use anchor_spl::token;
-use anchor_spl::token::{InitializeMint, Mint, MintTo, Token, TokenAccount};
+use anchor_spl::token::{InitializeMint2, Mint, MintTo, Token, TokenAccount};
 use mpl_token_metadata::instructions::{
     CreateMasterEditionV3Cpi, CreateMasterEditionV3InstructionArgs, CreateMetadataAccountV3Cpi,
     CreateMetadataAccountV3InstructionArgs,
@@ -26,12 +26,15 @@ pub fn create_nft(
     }];
 
     // 1. Initialize the mint account for the NFT (1 decimal, fixed supply of 1)
-    token::initialize_mint(
-        ctx.accounts.initialize_mint_ctx(),
-        0, // Decimals: NFTs have 0 decimals
-        &payer.key(),
-        Some(&payer.key()),
-    )?;
+
+    // token::initialize_mint2(
+    //     ctx.accounts.initialize_mint_ctx(),
+    //     0, // Decimals: NFTs have 0 decimals
+    //     &payer.key(),
+    //     Some(&payer.key()),
+    // )?;
+
+    //the above is already being done by anchor in the account declaration  
 
     // 2. Create metadata for the NFT
     let mint_key = &ctx.accounts.mint.key();
@@ -117,6 +120,8 @@ pub struct CreateNft<'info> {
     ///CHECK : this is safe because we dont read or write from this account
     #[account(
     init,
+    seeds = [b"mint"], // Replace with your seed
+    bump,
     payer = payer,
     mint::decimals = 0,
     mint::authority = payer,
@@ -126,12 +131,10 @@ pub struct CreateNft<'info> {
 
     ///CHECK : this is safe because we dont read or write from this account
     #[account(
-        init,
-        payer = payer,
+        mut,
         seeds = [b"metadata", mpl_token_metadata::ID.as_ref(), mint.key().as_ref()],
         bump,
-        space = 256
-    )]
+)]
     pub metadata: UncheckedAccount<'info>, //check if a struct has to be created for this
 
     ///CHECK : this is safe because we dont read or write from this account
@@ -147,6 +150,8 @@ pub struct CreateNft<'info> {
     ///CHECK : this is safe because we dont read or write from this account
     #[account(
         init,
+        seeds = [payer.key().as_ref(), mint.key().as_ref()],
+        bump,
         payer = payer,
         token::mint = mint,
         token::authority = payer,
@@ -175,15 +180,15 @@ pub struct CreateNft<'info> {
 }
 
 impl<'info> CreateNft<'info> {
-    fn initialize_mint_ctx(&self) -> CpiContext<'_, '_, '_, 'info, InitializeMint<'info>> {
-        //this account below might have to be changed later
-        let _signer : &[&[&[u8]]];
+
+    fn _initialize_mint_ctx(&self) -> CpiContext<'_, '_, '_, 'info, InitializeMint2<'info>> {
+        //TODO: this account below might have to be changed later
+        let _signer : &[&[&[u8]]] = &[&[b"mint"]];
 
         CpiContext::new( //should I use new_with_signer here?
             self.token_program.to_account_info(),
-            InitializeMint {
+            InitializeMint2 {
                 mint: self.mint.to_account_info(),
-                rent: self.rent.to_account_info(),
             },
         )
     }
@@ -198,4 +203,6 @@ impl<'info> CreateNft<'info> {
             },
         )
     }
+
+   
 }
