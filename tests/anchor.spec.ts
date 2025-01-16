@@ -8,6 +8,7 @@ import {
 	SendTransactionError,
 } from "@solana/web3.js";
 import { simulateTransaction } from "@coral-xyz/anchor/dist/cjs/utils/rpc";
+import { findMasterEditionPda, findMetadataPda } from "./utils";
 
 describe("royalty nft tests", () => {
 	const provider = anchor.AnchorProvider.env();
@@ -17,6 +18,8 @@ describe("royalty nft tests", () => {
 
 	const program = anchor.workspace.RoyaltyNft as Program<RoyaltyNft>;
 	const payer = Keypair.generate();
+
+	const metadataContractAddress = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s";
 
 	beforeAll(async () => {
 		// Transfer SOL to payer
@@ -54,6 +57,8 @@ describe("royalty nft tests", () => {
 				anchor.utils.token.TOKEN_PROGRAM_ID
 			);
 
+		const [metadataPda, metadataAccountBump] = findMetadataPda(mintPda);
+		const [masterEditionPda, masterEditionBump] = findMasterEditionPda(mintPda);
 		console.log(
 			"mintPda",
 			mintPda.toBase58(),
@@ -62,12 +67,18 @@ describe("royalty nft tests", () => {
 			"\n payer",
 			payer.publicKey.toBase58(),
 			"\n payer balance",
-			await connection.getBalance(payer.publicKey)
+			await connection.getBalance(payer.publicKey),
+			"\n metadataPda",
+			metadataPda,
+			"\n masterEditionPda",
+			masterEditionPda
 		);
 		const tx = await program.methods
 			.createNft("SYM", "test-token", "test-uri")
 			.accounts({
 				payer: payer.publicKey,
+				editionAccount: masterEditionPda,
+				metadata: metadataPda,
 			})
 			.transaction();
 
